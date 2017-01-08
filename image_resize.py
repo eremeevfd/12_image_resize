@@ -43,18 +43,6 @@ def warn_if_new_proportions_not_matching(original_image, resized_image):
         print('You are changing proportions of picture!')
 
 
-def resize_image_using_width(width, original_image, original_image_scale):
-    return original_image.resize((int(width * original_image_scale), width))
-
-
-def resize_image_using_height(height, original_image, original_image_scale):
-    return original_image.resize((height, int(height / original_image_scale)))
-
-
-def resize_image_using_width_and_height(height, width, original_image):
-    return original_image.resize((height, width))
-
-
 def resizing_controller(arguments, original_image):
     if arguments.scale:
         if arguments.width or arguments.height:
@@ -62,13 +50,13 @@ def resizing_controller(arguments, original_image):
         else:
             return resize_image_using_scale(arguments.scale, original_image)
     elif arguments.height and arguments.width:
-        return resize_image_using_width_and_height(arguments.height, arguments.width, original_image)
+        return original_image.resize((arguments.height, arguments.width))
     elif arguments.height:
         original_image_scale = calculate_image_proportions(original_image)
-        return resize_image_using_height(arguments.height, original_image, original_image_scale)
+        return original_image.resize((arguments.height, int(arguments.height / original_image_scale)))
     elif arguments.width:
         original_image_scale = calculate_image_proportions(original_image)
-        return resize_image_using_width(arguments.width, original_image, original_image_scale)
+        return original_image.resize((int(arguments.width * original_image_scale), arguments.width))
 
 
 def get_extension():
@@ -94,11 +82,12 @@ def get_path_ro_result_image_in_original_image_dir(path_to_original):
 
 
 def get_resized_image_name_with_new_properties(original_name, resized_image, extension):
-    return original_name + \
-                   '__{height}x{width}{extension}'.format(
-                       height=resized_image.size[0],
-                       width=resized_image.size[1],
-                       extension=extension)
+    return '{original_name}__{height}x{width}{extension}'.format(
+                                                                original_name=original_name,
+                                                                height=resized_image.size[0],
+                                                                width=resized_image.size[1],
+                                                                extension=extension
+                                                                )
 
 
 def resize_image(path_to_original, path_to_result):
